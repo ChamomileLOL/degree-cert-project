@@ -1,0 +1,91 @@
+/* client/src/components/Certificate.css */
+.cert-container {
+    width: 210mm;
+    height: 297mm; /* A4 Size */
+    padding: 20mm;
+    margin: 20px auto;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    font-family: 'Times New Roman', Times, serif;
+    position: relative;
+    color: #000;
+}
+
+/* Header Section */
+.cert-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.uni-title-en {
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.uni-title-mr {
+    font-family: 'Noto Serif Devanagari', serif;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.accreditation {
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* Body Section */
+.cert-body {
+    text-align: center;
+    line-height: 1.6;
+}
+
+.intro-text {
+    font-size: 16px;
+    margin: 20px 0;
+}
+
+.degree-name {
+    font-size: 26px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 15px 0;
+}
+
+.candidate-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 20px 0;
+    text-decoration: underline;
+}
+
+.college-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Footer Section */
+.cert-footer {
+    margin-top: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.footer-left p, .footer-right p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.seat-no {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 12px;
+    position: absolute;
+    bottom: 20mm;
+    left: 20mm;
+}
