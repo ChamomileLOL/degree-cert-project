@@ -13,7 +13,7 @@ function ViewCertificate() {
         const fetchCertificate = async () => {
             try {
                 // 1. Call the Backend API
-                const response = await axios.get(`https://degree-cert-project.onrender.com/api/students/search/${serialNumber}`);
+                const response = await axios.get(`https://degree-cert-project-v2.onrender.com/api/students/search/${serialNumber}`);
                 const dbData = response.data;
 
                 // 2. Transform DB data to Component format
