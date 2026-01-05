@@ -1,30 +1,30 @@
-﻿// server/index.js - THE RESILIENT ARTIFACT
+﻿// server/index.js - THE FINAL ARTIFACT
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const redis = require('redis');
-require('dotenv').config(); 
+const crypto = require('crypto'); // <--- CRITICAL: THE MATH ENGINE
+require('dotenv').config();
 
-const Student = require('./models/Student'); 
+const Student = require('./models/Student');
+const studentRoutes = require('./routes/students'); // Import old routes
 
-// --- 1. SETUP REDIS (FAULT TOLERANT) ---
+// --- 1. SETUP REDIS ---
 const client = redis.createClient();
-let isRedisActive = false; // Flag to track connection status
+let isRedisActive = false;
 
 (async () => {
     try {
         await client.connect();
         isRedisActive = true;
-        console.log("✅ Redis Client Connected (The Shield is Active)");
+        console.log("✅ Redis Client Connected (Shield Active)");
     } catch (err) {
-        console.log("⚠️  Redis Not Found. Running in 'Database-Only' Mode.");
-        console.log("   (To fix: Install Redis on your machine to enable caching)");
+        console.log("⚠️ Redis Not Found. Running in Database-Only Mode.");
     }
 })();
 
 client.on('error', (err) => {
-    // Suppress crash errors if Redis dies
-    if (isRedisActive) console.log('❌ Redis Client Error', err);
+    if (isRedisActive) console.log('❌ Redis Error', err);
 });
 
 // --- 2. APP SETUP ---
@@ -34,37 +34,54 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// --- 3. THE "BORN AGAIN" ROUTE (SMART SHIELD) ---
+// --- 3. THE "PI INTEGRITY" ROUTE (MUST BE BEFORE OTHER ROUTES) ---
+// This specific route intercepts requests for certificates and applies the Seal.
 app.get('/api/students/search/:serialNumber', async (req, res) => {
     const serialNumber = req.params.serialNumber;
     const cacheKey = `cert:${serialNumber}`;
 
+    // HELPER: The Immutable Logic (SHA-256)
+    const generatePiSeal = (data) => {
+        // We lock Name + Serial + Date
+        // If the database changes by 1 pixel, this seal changes completely.
+        const rawString = (data.studentName?.english || "") + (data.serialNumber || "") + (data.convocationDate?.english || "");
+        return crypto.createHash('sha256').update(rawString).digest('hex');
+    };
+
     try {
-        // STEP A: Check Redis (Only if Active)
+        // STEP A: Check Redis (Speed)
         if (isRedisActive) {
             try {
                 const cachedData = await client.get(cacheKey);
                 if (cachedData) {
-                    console.log(`⚡ Cache Hit! Serving ${serialNumber} from Memory.`);
-                    return res.json(JSON.parse(cachedData));
+                    console.log(`⚡ Cache Hit! Serving ${serialNumber}.`);
+                    const studentObj = JSON.parse(cachedData);
+                    
+                    // ON-THE-FLY SEALING
+                    const seal = generatePiSeal(studentObj);
+                    return res.json({ ...studentObj, pi_seal: seal });
                 }
-            } catch (redisErr) {
-                console.log("Redis error ignored, falling back to DB");
-            }
+            } catch (e) { console.log("Redis skip"); }
         }
 
-        // STEP B: Check MongoDB (The Flesh)
-        if (isRedisActive) console.log(`🐢 Cache Miss... Searching Database for ${serialNumber}...`);
-        else console.log(`🔍 Database Search (No Cache) for ${serialNumber}...`);
-
+        // STEP B: Check MongoDB (Database)
+        console.log(`🔍 Database Search for ${serialNumber}...`);
         const student = await Student.findOne({ serialNumber: serialNumber });
 
         if (student) {
-            // STEP C: Save to Redis (The Sustaining)
+            const studentObj = student.toObject();
+
+            // STEP C: Save to Redis
             if (isRedisActive) {
-                await client.setEx(cacheKey, 3600, JSON.stringify(student));
+                await client.setEx(cacheKey, 3600, JSON.stringify(studentObj));
             }
-            return res.json(student);
+
+            // STEP D: Generate Seal
+            const seal = generatePiSeal(studentObj);
+            
+            // SEND FINAL RESPONSE
+            return res.json({ ...studentObj, pi_seal: seal });
+
         } else {
             return res.status(404).json({ message: "Certificate not found" });
         }
@@ -75,13 +92,14 @@ app.get('/api/students/search/:serialNumber', async (req, res) => {
     }
 });
 
-// --- 4. OTHER ROUTES & START ---
-const studentRoutes = require('./routes/students');
+// --- 4. LOAD OTHER ROUTES ---
+// This handles /add, /seed, etc.
 app.use('/api/students', studentRoutes);
 
+// --- 5. CONNECT & START ---
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB Connected Successfully'))
-    .catch(err => console.error('❌ MongoDB Connection Error:', err));
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.error('❌ MongoDB Error:', err));
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

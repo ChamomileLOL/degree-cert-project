@@ -1,20 +1,21 @@
-﻿// server/seed.js
+﻿// server/seed.js - THE EXACT CLONE
 const mongoose = require('mongoose');
 const Student = require('./models/Student');
-require('dotenv').config(); // Load environment variables
+require('dotenv').config();
 
-mongoose.connect(process.env.MONGO_URI) // Use the variable
-    .then(() => console.log('✅ Connected to DB for Seeding'))
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('✅ Connected for Cloning...'))
     .catch(err => console.error(err));
 
 const seedData = async () => {
-    // 1. Delete existing data to avoid duplicates
+    // 1. Wipe the Slate Clean
     await Student.deleteMany({});
 
-    // 2. Create the Student Record
+    // 2. Insert The Exact Clone (From PDF)
     const student = new Student({
-        serialNumber: "389390",
-        registrationNumber: "24-BECET-23D-0736-4046076",
+        serialNumber: "389390", // Bottom Right
+        registrationNumber: "24-BECET-23D-0736-04046076", // CORRECTED (Added the '0')
+        
         studentName: {
             english: "MOORKATTIL XAVIER SIBY MADHU",
             marathi: "मूरकट्टील झेवियर सिबी मधु"
@@ -27,8 +28,12 @@ const seedData = async () => {
             english: "Electronics and Telecommunication Engineering",
             marathi: "इलेक्ट्रॉनिक्स आणि दूरसंचार अभियांत्रिकी"
         },
+        
+        // The Numbers
         cgpi: 6.90,
         totalCgpi: 10.00,
+        
+        // The Dates
         examMonthYear: {
             english: "December 2023",
             marathi: "डिसेंबर २०२३"
@@ -40,7 +45,7 @@ const seedData = async () => {
     });
 
     await student.save();
-    console.log("✅ Student Data Added Successfully!");
+    console.log("✅ Exact Clone Created. Database Updated.");
     process.exit();
 };
 

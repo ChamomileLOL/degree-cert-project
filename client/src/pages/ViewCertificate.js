@@ -13,23 +13,26 @@ function ViewCertificate() {
         const fetchCertificate = async () => {
             try {
                 // 1. Call the Backend API
-                const response = await axios.get(`https://degree-cert-project-v2.onrender.com/api/students/search/${serialNumber}`);
+                // ENSURE THIS URL MATCHES YOUR SERVER (localhost:5000 or Render URL)
+                const response = await axios.get(`http://localhost:5000/api/students/search/${serialNumber}`);
                 const dbData = response.data;
 
                 // 2. Transform DB data to Component format
-                // The DB has nested objects (studentName.english), but Component expects flat props
                 const formattedData = {
                     name: dbData.studentName.english,
                     nameMr: dbData.studentName.marathi,
                     college: dbData.collegeName.english,
-                    degree: "BACHELOR OF ENGINEERING", // Hardcoded as per PDF context
+                    degree: "BACHELOR OF ENGINEERING",
                     branch: dbData.branch.english,
-                    cgpi: dbData.cgpi.toFixed(2), // Ensure it shows "6.90" not "6.9"
+                    cgpi: dbData.cgpi.toFixed(2),
                     examDate: dbData.examMonthYear.english,
                     convocationDate: dbData.convocationDate.english,
-                    seatNumber: dbData.registrationNumber.split('-').pop(), // Extracts '4046076'
-                    fullSeatNo: dbData.registrationNumber,
-                    serialNo: dbData.serialNumber
+                    seatNumber: dbData.registrationNumber.split('-').pop(),
+                    
+                    // --- THE CRITICAL FIXES ---
+                    fullSeatNo: dbData.registrationNumber, // Ensures 04046076
+                    serialNo: dbData.serialNumber,
+                    pi_seal: dbData.pi_seal // <--- THIS WAS MISSING. ADD IT.
                 };
 
                 setStudentData(formattedData);
