@@ -1,8 +1,9 @@
 ﻿import React from 'react';
+import QRCode from 'react-qr-code'; // <--- IMPORT THE MATRIX
 import './Certificate.css';
 
 const Certificate = ({ student }) => {
-    // Fallback data if no student is passed (for testing/design mode)
+    // Fallback data for testing/design mode
     const data = student || {
         name: "MOORKATTIL XAVIER SIBY MADHU",
         nameMr: "मूरकट्टील झेवियर सिबी मधु",
@@ -12,10 +13,10 @@ const Certificate = ({ student }) => {
         cgpi: "6.90",
         examDate: "December 2023",
         convocationDate: "7th January, 2025",
-        seatNumber: "04046076", // CORRECTED: Added leading Zero
-        fullSeatNo: "24-BECET-23D-0736-04046076", // CORRECTED: Full ID
+        seatNumber: "04046076",
+        fullSeatNo: "24-BECET-23D-0736-04046076",
         serialNo: "389390",
-        pi_seal: "PREVIEW-MODE-NO-HASH-GENERATED"
+        pi_seal: "PREVIEW-MODE-NO-HASH" // Default if no data
     };
 
     return (
@@ -61,48 +62,35 @@ const Certificate = ({ student }) => {
                 </div>
                 <div className="footer-right" style={{ textAlign: 'center' }}>
                     <div style={{ height: '50px' }}>
-                        {/* Signature Placeholder */}
                         <span style={{ fontFamily: 'Cursive', fontSize: '20px' }}>Ravindra Kulkarni</span>
                     </div>
                     <p><strong>Vice-Chancellor</strong></p>
                 </div>
             </div>
 
-            {/* BOTTOM CODES */}
-            <div className="seat-no">
-                {/* Use the full registration number from DB if available, else fallback */}
+            {/* BOTTOM LEFT: SEAT & SERIAL */}
+            <div className="seat-no" style={{ position: 'absolute', bottom: '25mm', left: '20mm', textAlign: 'left' }}>
                 {data.fullSeatNo || `24-BECET-23D-0736-${data.seatNumber}`} <br />
                 <span style={{ color: 'red' }}>Serial No: {data.serialNo || '389390'}</span>
             </div>
 
-            {/* PI INTEGRITY SEAL */}
-            <div className="pi-seal-section" style={{ 
-                position: 'absolute', 
-                bottom: '5mm', 
-                left: '0', 
-                right: '0', 
-                textAlign: 'center',
-                borderTop: '1px solid #ccc',
-                paddingTop: '5px',
-                width: '80%',
-                margin: '0 auto'
-            }}>
-                <p style={{ fontSize: '10px', color: '#666', margin: '0', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                    Cryptographic Integrity Seal (Immutable Pi)
+            {/* BOTTOM RIGHT: THE SACRED BARCODE (PI SEAL) */}
+            <div style={{ position: 'absolute', bottom: '20mm', right: '20mm', textAlign: 'center' }}>
+                {/* The Container for the QR Code */}
+                <div style={{ background: 'white', padding: '5px', display: 'inline-block' }}>
+                    <QRCode 
+                        value={data.pi_seal || "INVALID"} 
+                        size={80} // Size in pixels
+                        level={"H"} // High Error Correction (Rugged)
+                    />
+                </div>
+                {/* The Label below the Code */}
+                <p style={{ fontSize: '9px', marginTop: '2px', color: '#333', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                    Immutable Pi Seal
                 </p>
-                <code style={{ 
-                    fontFamily: 'Courier New', 
-                    fontSize: '9px', 
-                    color: '#333', 
-                    display: 'block', 
-                    marginTop: '2px',
-                    wordBreak: 'break-all'
-                }}>
-                    {data.pi_seal || "VERIFYING INTEGRITY..."}
-                </code>
             </div>
 
-        </div> /* <--- THIS WAS MISSING. I HAVE RESTORED IT. */
+        </div>
     );
 };
 
