@@ -1,4 +1,8 @@
 ﻿// server/index.js - THE FINAL ARTIFACT
+const morgan = require('morgan');
+const sentinel = require('./middleware/sentinel');
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -33,6 +37,17 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+// --- CCTV SURVEILLANCE START ---
+// Create a write stream (in append mode) to store logs
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'cctv_access.log'), { flags: 'a' });
+
+// Log every request (IP, Date, User-Agent)
+app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url" :status :user-agent', { stream: accessLogStream }));
+// --- CCTV SURVEILLANCE END ---
+
+// --- ACTIVATE SENTINEL FIREWALL ---
+app.use(sentinel); 
+// ----------------------------------
 
 // --- 3. THE "PI INTEGRITY" ROUTE (MUST BE BEFORE OTHER ROUTES) ---
 // This specific route intercepts requests for certificates and applies the Seal.

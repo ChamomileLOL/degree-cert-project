@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import Certificate from '../components/Certificate';
+import Certificate from '../components/Certificate'; // <--- NOW IT WILL BE USED
 
 function ViewCertificate() {
     const { serialNumber } = useParams();
@@ -12,12 +12,12 @@ function ViewCertificate() {
     useEffect(() => {
         const fetchCertificate = async () => {
             try {
-                // 1. Call the Backend API
-                // ENSURE THIS URL MATCHES YOUR SERVER (localhost:5000 or Render URL)
-                const response = await axios.get(`http://localhost:5000/api/students/search/${serialNumber}`);
+                // Ensure this matches your Server Port (5000)
+                const baseURL = 'http://localhost:5000'; 
+                const response = await axios.get(`${baseURL}/api/students/search/${serialNumber}`);
                 const dbData = response.data;
 
-                // 2. Transform DB data to Component format
+                // Transform DB data for the Component
                 const formattedData = {
                     name: dbData.studentName.english,
                     nameMr: dbData.studentName.marathi,
@@ -28,18 +28,22 @@ function ViewCertificate() {
                     examDate: dbData.examMonthYear.english,
                     convocationDate: dbData.convocationDate.english,
                     seatNumber: dbData.registrationNumber.split('-').pop(),
-                    
-                    // --- THE CRITICAL FIXES ---
-                    fullSeatNo: dbData.registrationNumber, // Ensures 04046076
+                    fullSeatNo: dbData.registrationNumber, 
                     serialNo: dbData.serialNumber,
-                    pi_seal: dbData.pi_seal // <--- THIS WAS MISSING. ADD IT.
+                    pi_seal: dbData.pi_seal 
                 };
 
-                setStudentData(formattedData);
+                setStudentData(formattedData); // <--- ASSIGNING THE VALUE
                 setLoading(false);
             } catch (err) {
                 console.error(err);
-                setError("Certificate not found! Please check the Serial Number.");
+                
+                // --- THE SENTINEL INTERCEPTION (BIOLOGICAL PI) ---
+                if (err.response && err.response.status === 403) {
+                    setError("TERMINATED"); // <--- ACTIVATING THE TRAP
+                } else {
+                    setError("Certificate not found! Please check the Serial Number.");
+                }
                 setLoading(false);
             }
         };
@@ -47,9 +51,26 @@ function ViewCertificate() {
         fetchCertificate();
     }, [serialNumber]);
 
-    if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Generating Certificate...</h2>;
+    // 1. LOADING STATE
+    if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Accessing Secure Ledger...</h2>;
+
+    // 2. THE BLACK SCREEN (SENTINEL BLOCK)
+    if (error === "TERMINATED") {
+        return (
+            <div style={{ backgroundColor: 'black', color: '#ff3333', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontFamily: 'Courier New', textAlign: 'center' }}>
+                <h1 style={{fontSize: '3rem', border: '3px solid red', padding: '20px'}}>ACCESS DENIED</h1>
+                <h2>ERROR 403: SENTINEL ACTIVE</h2>
+                <p style={{marginTop: '20px', fontSize: '1.2rem'}}>IDENTITY VERIFICATION FAILED.</p>
+                <p>The entity attempting access is blacklisted.</p>
+                <p style={{opacity: 0.6, fontSize: '12px', marginTop: '50px'}}>REF: ITE_ITE2_MERGED.PDF</p>
+            </div>
+        );
+    }
+
+    // 3. GENERIC ERROR
     if (error) return <h2 style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}>{error}</h2>;
 
+    // 4. THE SUCCESS STATE (THE DEGREE)
     return (
         <div style={{ background: '#f0f0f0', padding: '20px', minHeight: '100vh' }}>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -58,8 +79,8 @@ function ViewCertificate() {
                 </button>
             </div>
 
-            {/* Pass the real fetched data to the component */}
-            <Certificate student={studentData} />
+            {/* PASSING THE DATA TO THE COMPONENT */}
+            <Certificate student={studentData} /> 
         </div>
     );
 }
