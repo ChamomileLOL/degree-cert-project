@@ -8,6 +8,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const redis = require('redis');
 const crypto = require('crypto'); // <--- CRITICAL: THE MATH ENGINE
+const helmet = require('helmet'); // <--- IMPORT THIS
+const liftUpTheSerpent = require('./middleware/prophecy'); // <--- IMPORT PROPHECY
 require('dotenv').config();
 
 const Student = require('./models/Student');
@@ -34,6 +36,13 @@ client.on('error', (err) => {
 // --- 2. APP SETUP ---
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// SEAL THE HULL
+app.use(helmet()); 
+
+// ACTIVATE THE SENTINEL (The Prophecy)
+// Apply this before any routes
+app.use(liftUpTheSerpent);
 
 app.use(cors());
 app.use(express.json());
