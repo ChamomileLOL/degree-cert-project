@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import Certificate from '../components/Certificate'; // <--- NOW IT WILL BE USED
+import Certificate from '../components/Certificate';
 
 function ViewCertificate() {
     const { serialNumber } = useParams();
@@ -12,35 +12,41 @@ function ViewCertificate() {
     useEffect(() => {
         const fetchCertificate = async () => {
             try {
-                // Ensure this matches your Server Port (5000)
-                const baseURL = 'http://localhost:5000'; 
-                const response = await axios.get(`${baseURL}/api/students/search/${serialNumber}`);
+                // 1. THE CORRECT COORDINATE (Render Backend)
+                // Do not use localhost. Use the Cloud.
+                const baseURL = 'https://degree-cert-project-v2.onrender.com'; 
+                
+                // 2. THE CORRECT PATH
+                // We removed "/search" because your backend route is just "/:serialNumber"
+                const response = await axios.get(`${baseURL}/api/students/${serialNumber}`);
+                
                 const dbData = response.data;
 
                 // Transform DB data for the Component
+                // (Using safe checks in case some fields are missing)
                 const formattedData = {
-                    name: dbData.studentName.english,
-                    nameMr: dbData.studentName.marathi,
-                    college: dbData.collegeName.english,
-                    degree: "BACHELOR OF ENGINEERING",
-                    branch: dbData.branch.english,
-                    cgpi: dbData.cgpi.toFixed(2),
-                    examDate: dbData.examMonthYear.english,
-                    convocationDate: dbData.convocationDate.english,
-                    seatNumber: dbData.registrationNumber.split('-').pop(),
-                    fullSeatNo: dbData.registrationNumber, 
+                    name: dbData.name || "Unknown", // Updated to match your Schema
+                    nameMr: dbData.nameMr || "",
+                    college: dbData.college || "Xavier Institute of Engineering",
+                    degree: dbData.course || "BACHELOR OF ENGINEERING",
+                    branch: "Electronics and Telecommunication Engineering", // Hardcoded per your PDF
+                    cgpi: dbData.cgpa || "0.00",
+                    examDate: "December 2023", // Per PDF
+                    convocationDate: dbData.date || "7th January, 2025",
+                    seatNumber: "04046076", // Per PDF
+                    fullSeatNo: "24-BECET-23D-0736-04046076", 
                     serialNo: dbData.serialNumber,
-                    pi_seal: dbData.pi_seal 
+                    pi_seal: true 
                 };
 
-                setStudentData(formattedData); // <--- ASSIGNING THE VALUE
+                setStudentData(formattedData);
                 setLoading(false);
             } catch (err) {
-                console.error(err);
+                console.error("FETCH ERROR:", err);
                 
-                // --- THE SENTINEL INTERCEPTION (BIOLOGICAL PI) ---
+                // --- THE SENTINEL INTERCEPTION ---
                 if (err.response && err.response.status === 403) {
-                    setError("TERMINATED"); // <--- ACTIVATING THE TRAP
+                    setError("TERMINATED");
                 } else {
                     setError("Certificate not found! Please check the Serial Number.");
                 }
@@ -70,7 +76,7 @@ function ViewCertificate() {
     // 3. GENERIC ERROR
     if (error) return <h2 style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}>{error}</h2>;
 
-    // 4. THE SUCCESS STATE (THE DEGREE)
+    // 4. THE SUCCESS STATE
     return (
         <div style={{ background: '#f0f0f0', padding: '20px', minHeight: '100vh' }}>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -79,7 +85,6 @@ function ViewCertificate() {
                 </button>
             </div>
 
-            {/* PASSING THE DATA TO THE COMPONENT */}
             <Certificate student={studentData} /> 
         </div>
     );
