@@ -74,21 +74,45 @@ const Certificate = ({ student }) => {
                 <span style={{ color: 'red' }}>Serial No: {data.serialNo || '389390'}</span>
             </div>
 
-            {/* BOTTOM RIGHT: THE SACRED BARCODE (PI SEAL) */}
-            <div style={{ position: 'absolute', bottom: '20mm', right: '20mm', textAlign: 'center' }}>
-                {/* The Container for the QR Code */}
-                <div style={{ background: 'white', padding: '5px', display: 'inline-block' }}>
-                    <QRCode 
-                        value={data.pi_seal || "INVALID"} 
-                        size={80} // Size in pixels
-                        level={"H"} // High Error Correction (Rugged)
-                    />
-                </div>
-                {/* The Label below the Code */}
-                <p style={{ fontSize: '9px', marginTop: '2px', color: '#333', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                    Immutable Pi Seal
-                </p>
-            </div>
+            {/* --- THE IMMUTABLE PI SEAL (REBORN) --- */}
+<div style={{ 
+    position: 'absolute', 
+    bottom: '40px', 
+    right: '40px', 
+    textAlign: 'center' 
+}}>
+    {/* THE QR CODE: Mathematical, Sharp, Scannable */}
+    <img 
+        src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://degree-cert-project-v2.onrender.com/view/${student.serialNo || '389390'}&color=000000&bgcolor=FFFFFF&margin=2`} 
+        alt="Immutable PI Seal"
+        style={{
+            border: '2px solid black',
+            padding: '5px',
+            background: 'white',
+            width: '100px',
+            height: '100px',
+            imageRendering: 'pixelated' // <--- MAKES IT CRISP
+        }}
+    />
+    
+    {/* THE CAPTION */}
+    <div style={{
+        marginTop: '5px',
+        fontSize: '8px',
+        fontFamily: 'Courier New, monospace', // <--- CRYPTOGRAPHIC FONT
+        fontWeight: 'bold',
+        letterSpacing: '1px'
+    }}>
+        IMMUTABLE PI SEAL
+    </div>
+    <div style={{
+        fontSize: '6px',
+        fontFamily: 'monospace',
+        color: '#333'
+    }}>
+        VERIFIED: {student.serialNo || '389390'}
+    </div>
+</div>
 
         </div>
     );
