@@ -1,25 +1,26 @@
 {
-    "name": "server",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon index.js"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "type": "commonjs",
-    "dependencies": {
-        "cors": "^2.8.5",
-        "dotenv": "^17.2.3",
-        "express": "^5.2.1",
-        "mongoose": "^9.0.2",
-        "morgan": "^1.10.1",
-        "redis": "^5.10.0"
-    },
-    "devDependencies": {
-        "nodemon": "^3.1.11"
-    }
+  "name": "server",
+  "version": "3.14.0",
+  "description": "The Ark. Sealed with Helmet. John 3:14 Fulfilled.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "Xavier",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "helmet": "^8.0.0",
+    "mongoose": "^9.0.2",
+    "morgan": "^1.10.1",
+    "redis": "^5.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
 }
