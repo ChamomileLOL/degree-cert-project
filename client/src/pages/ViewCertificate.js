@@ -40,7 +40,7 @@ function ViewCertificate() {
                     branch: "Electronics and Telecommunication Engineering",
 
                     // CGPA: Matches "6.90"
-                    cgpi: dbData.cgpa || (dbData.cgpi ? dbData.cgpi.toString() : "6.90"),
+                    cgpi: parseFloat(dbData.cgpa || "6.90").toFixed(2),
 
                     // EXAM: "December 2023"
                     examDate: "December 2023",
