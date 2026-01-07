@@ -83,7 +83,7 @@ const Certificate = ({ student }) => {
 }}>
     {/* THE QR CODE: Mathematical, Sharp, Scannable */}
     <img 
-        src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://degree-cert-project-v2.onrender.com/view/${student.serialNo || '389390'}&color=000000&bgcolor=FFFFFF&margin=2`} 
+        src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://degree-cert-project-v2.onrender.com/%23/view/${student.serialNo || '389390'}&color=000000&bgcolor=FFFFFF&margin=2`}
         alt="Immutable PI Seal"
         style={{
             border: '2px solid black',

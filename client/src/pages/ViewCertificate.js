@@ -12,50 +12,26 @@ function ViewCertificate() {
     useEffect(() => {
         const fetchCertificate = async () => {
             try {
-                // 1. POINT TO THE CLOUD (Render)
+                // 1. POINT TO THE CLOUD
                 const baseURL = 'https://degree-cert-project-v2.onrender.com'; 
                 
                 // 2. FETCH DATA
                 const response = await axios.get(`${baseURL}/api/students/${serialNumber}`);
                 const dbData = response.data;
 
-                console.log("RECEIVED DATA:", dbData); // Debugging
-
-                // 3. MAP THE OFFICIAL PDF DATA (Crucial Fix)
-                // We handle both the "Flat" structure (New) and "Nested" structure (Old) just in case.
+                // 3. MAP THE DATA
                 const formattedData = {
-                    // NAME: Matches "MOORKATTIL XAVIER SIBY MADHU"
                     name: dbData.name || (dbData.studentName ? dbData.studentName.english : "Unknown"), 
-                    
-                    // MARATHI NAME: Hardcoded or DB (Optional)
                     nameMr: "मूरकट्टील झेवियर सिबी मधु", 
-
-                    // COLLEGE: "Xavier Institute of Engineering"
                     college: dbData.college || "Xavier Institute of Engineering",
-
-                    // DEGREE
                     degree: "BACHELOR OF ENGINEERING",
-
-                    // BRANCH: "Electronics and Telecommunication Engineering"
                     branch: "Electronics and Telecommunication Engineering",
-
-                    // CGPA: Matches "6.90"
                     cgpi: parseFloat(dbData.cgpa || "6.90").toFixed(2),
-
-                    // EXAM: "December 2023"
                     examDate: "December 2023",
-
-                    // CONVOCATION: "7th January, 2025"
                     convocationDate: dbData.date || "7th January, 2025",
-
-                    // SEAT/PRN
                     seatNumber: "04046076", 
                     fullSeatNo: "24-BECET-23D-0736-04046076", 
-                    
-                    // SERIAL
                     serialNo: dbData.serialNumber || serialNumber,
-                    
-                    // SEAL
                     pi_seal: true 
                 };
 
@@ -71,13 +47,13 @@ function ViewCertificate() {
         fetchCertificate();
     }, [serialNumber]);
 
-    // 1. LOADING STATE
+    // 1. LOADING
     if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Accessing Secure Ledger...</h2>;
 
-    // 2. ERROR STATE
+    // 2. ERROR
     if (error) return <h2 style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}>{error}</h2>;
 
-    // 3. SUCCESS STATE
+    // 3. SUCCESS
     return (
         <div style={{ background: '#f0f0f0', padding: '20px', minHeight: '100vh' }}>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -86,6 +62,10 @@ function ViewCertificate() {
                 </button>
             </div>
 
+            {/* PASSING DATA TO CERTIFICATE COMPONENT */}
+            {/* Note: We need to ensure the QR inside <Certificate> component also uses the Hash link. 
+                But since the QR logic is inside Certificate.js, we must update THAT file next. 
+                This file is good. */}
             <Certificate student={studentData} /> 
         </div>
     );
