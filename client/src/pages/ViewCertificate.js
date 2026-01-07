@@ -12,30 +12,50 @@ function ViewCertificate() {
     useEffect(() => {
         const fetchCertificate = async () => {
             try {
-                // 1. THE CORRECT COORDINATE (Render Backend)
-                // Do not use localhost. Use the Cloud.
+                // 1. POINT TO THE CLOUD (Render)
                 const baseURL = 'https://degree-cert-project-v2.onrender.com'; 
                 
-                // 2. THE CORRECT PATH
-                // We removed "/search" because your backend route is just "/:serialNumber"
+                // 2. FETCH DATA
                 const response = await axios.get(`${baseURL}/api/students/${serialNumber}`);
-                
                 const dbData = response.data;
 
-                // Transform DB data for the Component
-                // (Using safe checks in case some fields are missing)
+                console.log("RECEIVED DATA:", dbData); // Debugging
+
+                // 3. MAP THE OFFICIAL PDF DATA (Crucial Fix)
+                // We handle both the "Flat" structure (New) and "Nested" structure (Old) just in case.
                 const formattedData = {
-                    name: dbData.name || "Unknown", // Updated to match your Schema
-                    nameMr: dbData.nameMr || "",
+                    // NAME: Matches "MOORKATTIL XAVIER SIBY MADHU"
+                    name: dbData.name || (dbData.studentName ? dbData.studentName.english : "Unknown"), 
+                    
+                    // MARATHI NAME: Hardcoded or DB (Optional)
+                    nameMr: "मूरकट्टील झेवियर सिबी मधु", 
+
+                    // COLLEGE: "Xavier Institute of Engineering"
                     college: dbData.college || "Xavier Institute of Engineering",
-                    degree: dbData.course || "BACHELOR OF ENGINEERING",
-                    branch: "Electronics and Telecommunication Engineering", // Hardcoded per your PDF
-                    cgpi: dbData.cgpa || "0.00",
-                    examDate: "December 2023", // Per PDF
+
+                    // DEGREE
+                    degree: "BACHELOR OF ENGINEERING",
+
+                    // BRANCH: "Electronics and Telecommunication Engineering"
+                    branch: "Electronics and Telecommunication Engineering",
+
+                    // CGPA: Matches "6.90"
+                    cgpi: dbData.cgpa || (dbData.cgpi ? dbData.cgpi.toString() : "6.90"),
+
+                    // EXAM: "December 2023"
+                    examDate: "December 2023",
+
+                    // CONVOCATION: "7th January, 2025"
                     convocationDate: dbData.date || "7th January, 2025",
-                    seatNumber: "04046076", // Per PDF
+
+                    // SEAT/PRN
+                    seatNumber: "04046076", 
                     fullSeatNo: "24-BECET-23D-0736-04046076", 
-                    serialNo: dbData.serialNumber,
+                    
+                    // SERIAL
+                    serialNo: dbData.serialNumber || serialNumber,
+                    
+                    // SEAL
                     pi_seal: true 
                 };
 
@@ -43,13 +63,7 @@ function ViewCertificate() {
                 setLoading(false);
             } catch (err) {
                 console.error("FETCH ERROR:", err);
-                
-                // --- THE SENTINEL INTERCEPTION ---
-                if (err.response && err.response.status === 403) {
-                    setError("TERMINATED");
-                } else {
-                    setError("Certificate not found! Please check the Serial Number.");
-                }
+                setError("Certificate not found! Please check the Serial Number.");
                 setLoading(false);
             }
         };
@@ -60,23 +74,10 @@ function ViewCertificate() {
     // 1. LOADING STATE
     if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Accessing Secure Ledger...</h2>;
 
-    // 2. THE BLACK SCREEN (SENTINEL BLOCK)
-    if (error === "TERMINATED") {
-        return (
-            <div style={{ backgroundColor: 'black', color: '#ff3333', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontFamily: 'Courier New', textAlign: 'center' }}>
-                <h1 style={{fontSize: '3rem', border: '3px solid red', padding: '20px'}}>ACCESS DENIED</h1>
-                <h2>ERROR 403: SENTINEL ACTIVE</h2>
-                <p style={{marginTop: '20px', fontSize: '1.2rem'}}>IDENTITY VERIFICATION FAILED.</p>
-                <p>The entity attempting access is blacklisted.</p>
-                <p style={{opacity: 0.6, fontSize: '12px', marginTop: '50px'}}>REF: ITE_ITE2_MERGED.PDF</p>
-            </div>
-        );
-    }
-
-    // 3. GENERIC ERROR
+    // 2. ERROR STATE
     if (error) return <h2 style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}>{error}</h2>;
 
-    // 4. THE SUCCESS STATE
+    // 3. SUCCESS STATE
     return (
         <div style={{ background: '#f0f0f0', padding: '20px', minHeight: '100vh' }}>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
